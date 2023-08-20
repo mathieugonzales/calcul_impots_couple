@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calcul des impôts</title>
+  <title>Calcul des impôts d'un couple</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
@@ -13,14 +13,15 @@
     <h1 class="text-2xl font-bold mb-4">Calcul des impôts</h1>
 
     <div class="mb-4">
-      <label for="salary1" class="block text-sm font-bold mb-2">Salaire 1 :</label>
-      <input type="number" id="salary1" v-model="salary1" @input="calculateTaxes"
+      <label for="salary1" class="block text-sm font-bold mb-2">Salaire 1 (net imposable annuel):</label>
+      <input type="number" id="salary1" min="0" oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null"  v-model="salary1" @input="calculateTaxes"
         class="w-full px-3 py-2 border rounded">
     </div>
 
     <div class="mb-4">
-      <label for="salary2" class="block text-sm font-bold mb-2">Salaire 2 :</label>
-      <input type="number" id="salary2" v-model="salary2" @input="calculateTaxes"
+      <label for="salary2" class="block text-sm font-bold mb-2">Salaire 2 (net imposable annuel):</label>
+      <input type="number" id="salary2"min="0" oninput="this.value = 
+      !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" v-model="salary2" @input="calculateTaxes"
         class="w-full px-3 py-2 border rounded">
     </div>
 
@@ -30,7 +31,7 @@
         class="w-full px-3 py-2 border rounded">
     </div>
 
-    <div class="mb-8">
+    <div v-if="salary1 > 0 || salary2 > 0" class="mb-8">
       <h2 class="text-lg font-bold mb-4">Détail des impôts individuels :</h2>
       <div>
         <h3 class="text-md font-bold mb-2">Personne 1</h3>
@@ -48,6 +49,14 @@
           </li>
         </ul>
       </div>
+      <div>
+        <h3 class="text-md font-bold mb-2">Couple</h3>
+        <ul>
+          <li v-for="tax in coupleTaxes" :key="tax.tranche" class="text-sm mb-1">
+            Tranche {{ tax.tranche }} : {{ tax.impot.toFixed(2) }} €
+          </li>
+        </ul>
+      </div>      
     </div>
 
     <div>
@@ -55,16 +64,16 @@
       <p class="text-sm mb-1">Impôts Personne 1 : {{ taxesUser1.toFixed(2) }} €</p>
       <p class="text-sm mb-1">Impôts Personne 2 : {{ taxesUser2.toFixed(2) }} €</p>
       <p class="text-sm mb-1">Impôts totaux sans PACS : {{ totalTaxesWithoutPacs.toFixed(2) }} €</p>
-      <p class="text-sm mb-1">Impôts totaux avec PACS : {{ totalTaxesWithPacs.toFixed(2) }} €</p>
-      <p class="text-sm mb-1">Différence d'impôts : {{ taxesDifference.toFixed(2) }} €</p>
-      <p v-if="taxesDifference > 0" class="text-green-500 inline-flex items-center">
-        <span class="mr-1">👍</span> Vous économiserez, en vous PACSant, {{ taxesDifference.toFixed(2) }} €
-      </p>
+      <p class="text-sm mb-1">Impôts totaux avec PACS : {{ totalTaxesWithPacs.toFixed(2) }} € </p>
+      <p v-if="taxesDifference > 0.111" class="text-sm mb-1">Différence d'impôts : {{ taxesDifference.toFixed(2) }} €</p>
+    </div>
+
+    <div class="text-sm text-gray-500 mt-4">
+      Note : Les calculs sont basés sur les données du barème des impôts de Juin 2023, applicable aux impôts de 2022. Plus d'information sur le <a class="text-blue-600 dark:text-blue-500 hover:underline" href=https://www.service-public.fr/particuliers/vosdroits/F1419>site du gouvernement</a>.
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
   <script src="app.js"></script>
 </body>
-
 </html>
